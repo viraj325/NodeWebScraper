@@ -37,11 +37,18 @@ const parseFunction = async (url) => {
     const html = response.body;
 
     // Use Cheerio to parse the HTML
-    const $ = cheerio.load(html);
+    let $ = cheerio.load(html);
     // Select all the elements with the class name "athing"
     //const entries = $('.athing');
-    const entries = $('.card.startup');
+    $(".main_link").each(function(i, item) {
+        console.log($('img', item).attr('data-src'));
+        console.log($("h1, p", item).text())
+    });
+    /*const entries = $('.card.startup');
     let fel = entries.children().first(); // div
+    //main_link
+    $ = cheerio.load(entries.html())
+    let something = $('.main_link')
     let lel = entries.children().last(); // a
     console.log("TagNames Below")
     //console.log(fel);
@@ -49,14 +56,14 @@ const parseFunction = async (url) => {
     console.log(fel.get(0).tagName);
     console.log(lel.get(0).tagName);
     console.log("TagNames End")
-    const elementTextList = []
+    const elementTextList = []*/
     // Loop through the entries
-    for (const entry of entries) {
+    /*for (const entry of something) {
         const element = $(entry);
         // Write each element's text to the terminal
         //console.log(element.text());
         elementTextList.push(element.text())
-    }
+    }*/
 
-    return elementTextList
+    return "hbjnn"//elementTextList
 }
