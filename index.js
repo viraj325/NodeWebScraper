@@ -2,10 +2,13 @@ const cheerio = require('cheerio');
 const { gotScraping } = require('got-scraping');
 const express = require('express')
 const app = express()
+const { Blob } = require('node:buffer');
 const port = 3000
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+const firebase = require("firebase/app");
+const { getStorage, ref, uploadBytes, uploadString } = require("firebase/storage");
+const { getAuth, signInWithEmailAndPassword } = require("firebase/auth");
+const {json} = require("express");
 
 const firebaseConfig = {
   apiKey: "AIzaSyD2HCSxg3EEMRzKLO7EdRJ_bOFCHajXDQk",
@@ -17,13 +20,27 @@ const firebaseConfig = {
   measurementId: "G-YTCBFCE6CH"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 app.get('/', (req, res) => {
     console.log("NodeJS Loaded")
     res.send('Hello World!')
+})
+
+app.get('/login', (req, res) => {
+    const auth = getAuth();
+    let email = "virajpatel325@gmail.com"
+    let password = "Upasana50!"
+    signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        // ...
+        res.send("Signed In")
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        res.send("Failed to Signed In")
+    });
 })
 
 app.get('/got_scraping', (req, res) => {
@@ -33,15 +50,21 @@ app.get('/got_scraping', (req, res) => {
 })
 
 app.get('/example', (req, res) => {
+    const storage = getStorage(firebaseApp);
     //'https://news.ycombinator.com/'
     parseFunction('https://washington.startups-list.com/').then(r => {
         console.log(r)
+        //const ref = storage.ref().child("/data.json");
+        const blah = ref(storage, "/data.json")
+        const jsonString = JSON.stringify(r);
+        //const blob = new Blob([r], { type: 'application/json' });
+        uploadString(blah, jsonString).then(() => {
+            console.log('Uploaded a raw string!');
+        });
+        /*uploadBytes(blah, blob).then(() => {
+            console.log('Uploaded a blob or file!');
+        });*/
         res.send(r)
-        /*const ref = firebase.storage().ref().child("/testing.json");
-        const jsonString = JSON.stringify({ hello: "world" });
-
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        ref.put(blob).then( ... )*/
     })
 })
 
